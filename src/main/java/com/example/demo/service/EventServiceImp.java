@@ -19,6 +19,7 @@ import com.example.demo.dto.GetEventResponse;
 import com.example.demo.dto.GetSummaryResponse;
 import com.example.demo.dto.ListTopEventsResponse;
 import com.example.demo.model.Event;
+import com.example.demo.NotFoundException;
 import com.example.demo.ValidationException;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,7 +75,7 @@ public class EventServiceImp implements EventService {
                 );
             } else {
                 log.atWarn().log("Event not found with ID: {}", event_id);
-                throw new ValidationException("Event not found with ID: " + event_id);
+                throw new NotFoundException("Event not found with ID: " + event_id);
             }
         }catch (Exception e) {
             log.atError().log(e.getMessage());
@@ -166,8 +167,8 @@ public class EventServiceImp implements EventService {
     }
 
     private ListTopEventsResponse wrapperResponse(List<Event> events) {
-        List<ListTopEventsResponse.Item> items = events.stream()
-            .map(event -> new ListTopEventsResponse.Item(event.getType(), 1))
+        List<ListTopEventsResponse.Item> items = countEvents(events).entrySet().stream()
+            .map(e -> new ListTopEventsResponse.Item(e.getKey(), e.getValue()))
             .collect(Collectors.toList());
         return new ListTopEventsResponse(items);
     }

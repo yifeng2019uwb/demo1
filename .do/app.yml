@@ -3,7 +3,7 @@ region: sfo2
 services:
   - name: demo-api-service
     # 1. CHANGE THIS to the exact folder path where your build.gradle is saved
-    source_dir: demo 
+    source_dir: /
     
     # 2. Tell the builder to run the Gradle wrapper to compile your code
     build_command: ./gradlew bootJar
