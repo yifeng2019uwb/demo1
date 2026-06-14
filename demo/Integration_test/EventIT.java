@@ -7,15 +7,19 @@ import java.util.Map;
 import java.util.UUID;
 
 public class EventIT {
-    static final String BASE_URL = "https://goldfish-app-ligib.ondigitalocean.app";
+    static final String BASE_URL = "https://shark-app-kt3v6.ondigitalocean.app";
     static final String BASE_PATH = "/api/v1/events";
     static final HttpClient client = HttpClient.newHttpClient();
 
-    public static void main(String[] args) {
+    static final UUID customer_id1 = UUID.randomUUID();
+
+    public static void main(String[] args) throws Exception {
         // Test code for event integration
+        createEvent_201();
+        System.out.println("\n==> All tests passed!");
     }
 
-    private static String createEvent_201(){
+    private static String createEvent_201() throws Exception {
         System.out.println("==> POST " + BASE_PATH);
         String body = """
             {
@@ -24,7 +28,7 @@ public class EventIT {
                 "timestamp": "2024-01-15",
                 "metadata": %s
             }
-            """.formatted(customer_id1, buildMetaDataJson("key", "value", 1));
+            """.formatted(customer_id1.toString(), buildMetaDataJson("key", "value", 1));
 
         var request = HttpRequest.newBuilder()
             .uri(URI.create(BASE_URL + BASE_PATH))
@@ -33,9 +37,9 @@ public class EventIT {
             .build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("Status: " + response.statusCode() + "  Body: " + response.body());
-        assert response.statusCode() == 200 : "Expected 200, got " + response.statusCode();
+        assert response.statusCode() == 201 : "Expected 200, got " + response.statusCode();
 
-        String r = resp.body();
+        String r = response.body();
         int start = r.indexOf("\"event_id\":\"") + 12;
         return r.substring(start, r.indexOf("\"", start));
     }

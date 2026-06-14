@@ -15,6 +15,6 @@ public record ListTopEventsResponse(
 ) {
     public record Item (
         String event_type,
-        Long count
+        Integer count
     ){}
 }

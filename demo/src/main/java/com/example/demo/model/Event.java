@@ -52,6 +52,10 @@ public class Event   {
         return id;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public String getCustomerId() {
         return customerId;
     }

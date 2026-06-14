@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Map;
 
 /*
@@ -12,7 +12,7 @@ public record GetEventResponse(
     String event_id,
     String customer_id,
     String event_type,
-    LocalDateTime timestamp,
+    LocalDate timestamp,
     Map<String, String> metadata
 ) {
 }

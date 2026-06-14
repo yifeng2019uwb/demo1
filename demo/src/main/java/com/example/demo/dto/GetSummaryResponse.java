@@ -13,7 +13,7 @@ Response: 200 — {
 
 public record GetSummaryResponse(
     String customer_id,
-    Long total_events,
-    Map<String, Long> event_breakdown
+    Integer total_events,
+    Map<String, Integer> event_breakdown
 ) {
 }

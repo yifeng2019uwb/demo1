@@ -63,37 +63,37 @@ Response: 200 — { "status": "healthy" }
 @RequestMapping("/api/v1/events")
 public class EventController {
 
-  // private final EventService eventService;
+  private final EventService eventService;
   private static final Logger log = LoggerFactory.getLogger(EventController.class);
 
 
-  public EventController(){
-
+  public EventController(EventService eventService) {
+    this.eventService = eventService;
   }
 
   @PostMapping
   public ResponseEntity<CreateEventResponse> createEvent(@Valid @RequestBody CreateEventRequest request) {
     // Implementation for creating an event
     log.atInfo().log("Event created with ID: {}", request.customer_id());
-    return ResponseEntity.status(201).body(new CreateEventResponse("Event created"));
+    return ResponseEntity.status(201).body(eventService.createEvent(request));
   }
 
   @GetMapping("/{event_id}")
   public ResponseEntity<GetEventResponse> getEvent(@PathVariable String event_id) {
     log.atInfo().log("Event retrieved with ID: {}", event_id);
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(eventService.getEvent(event_id));
   }
 
   @GetMapping("/summary")
   public ResponseEntity<GetSummaryResponse> getSummary(@ModelAttribute GetSummaryReqeust request) {
     log.atInfo().log("Summary retrieved for customer: {}", request.customer_id());
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(eventService.getSummary(request.customer_id(), request.start_time(), request.end_time()));
   }
 
   @GetMapping("/top-events")
   public ResponseEntity<ListTopEventsResponse> getTopEvents(@ModelAttribute ListTopEventsRequest request) {
     log.atInfo().log("Top events retrieved with limit: {}", request.limit());
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(eventService.getTopEvents(request.limit()));
   }
 
   @GetMapping("/health")
