@@ -18,6 +18,6 @@ public interface EventDao extends JpaRepository<Event, String> {
 
     List<Event> findEventsByTimestampBetween(LocalDate startDate, LocalDate endDate);
 
-    List<Event> findTopEvents(int limit);
+    List<Event> findTopEventsByTimestamp(int limit);
     
 }
