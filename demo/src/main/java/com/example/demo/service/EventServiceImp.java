@@ -48,6 +48,7 @@ public class EventServiceImp implements EventService {
                 savedEvent.getId()
             );
         }catch (Exception e) {
+            log.atError().log(e.getMessage());
             throw new UnsupportedOperationException("Unimplemented method 'createEvent'");
         }
     }
@@ -75,6 +76,7 @@ public class EventServiceImp implements EventService {
                 throw new ValidationException("Event not found with ID: " + event_id);
             }
         }catch (Exception e) {
+            log.atError().log(e.getMessage());
             throw new UnsupportedOperationException("Unimplemented method 'getEvent'");
         }
     }
@@ -101,6 +103,7 @@ public class EventServiceImp implements EventService {
                 countEvents(events)
             );
         }catch (Exception e) {
+            log.atError().log(e.getMessage());
             throw new UnsupportedOperationException("Unimplemented method 'getSummary'");
         }
     }
@@ -113,35 +116,42 @@ public class EventServiceImp implements EventService {
             //     new ArrayList<Integer>()
             // );
             if (limit <= 0) {
+                log.atError().log("Limit must be a positive integer {} ", limit);
                 throw new ValidationException("Limit must be a positive integer");
             }
             if (limit > 100) {
+                log.atError().log("Limit cannot exceed 100 {} ", limit);
                 throw new ValidationException("Limit cannot exceed 100");
             }
             List<Event> events = eventDao.findTopEventsByTimestamp(limit);
             log.atInfo().log("Top events retrieved with limit: {}, event count: {}", limit, events.size());
             return wrapperResponse(events);
         }catch (Exception e) {
+            log.atError().log(e.getMessage());
             throw new UnsupportedOperationException("Unimplemented method 'getTopEvents'");
         }
     }
     
     private void validateTimestamp(LocalDate timestamp) {
         if (timestamp == null) {
+            log.atError().log("Timestamp cannot be null");
             throw new ValidationException("Timestamp cannot be null");
         }
         if (timestamp.isAfter(LocalDate.now())) {
+            log.atError().log("Timestamp cannot be in the future");
             throw new ValidationException("Timestamp cannot be in the future");
         }
     }
 
     private UUID validateUUID(String uuid) {
         if (uuid == null) {
+            log.atError().log("UUID cannot be null");
             throw new ValidationException("UUID cannot be null");
         }
         try {
             return UUID.fromString(uuid);
         } catch (IllegalArgumentException e) {
+            log.atError().log("Invalid UUID format");
             throw new ValidationException("Invalid UUID format");
         }
     }

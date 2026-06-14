@@ -46,6 +46,7 @@ public class Event   {
         this.customerId = customerId;
         this.type = type;
         this.timestamp = timestamp;
+        this.metadata = metadata;
     }
 
     public String getId() {
