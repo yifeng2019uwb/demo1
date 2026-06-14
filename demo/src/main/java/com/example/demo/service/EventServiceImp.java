@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import org.springframework.data.domain.PageRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +124,7 @@ public class EventServiceImp implements EventService {
                 log.atError().log("Limit cannot exceed 100 {} ", limit);
                 throw new ValidationException("Limit cannot exceed 100");
             }
-            List<Event> events = eventDao.findTopEventsByTimestamp(limit);
+            List<Event> events = eventDao.findTopEventsSortedByTimestampDesc(PageRequest.of(0, limit));
             log.atInfo().log("Top events retrieved with limit: {}, event count: {}", limit, events.size());
             return wrapperResponse(events);
         }catch (Exception e) {
