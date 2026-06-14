@@ -3,7 +3,6 @@ package com.example.demo.service;
 import java.util.UUID;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import org.springframework.data.domain.PageRequest;
@@ -39,99 +38,59 @@ public class EventServiceImp implements EventService {
 
     @Override
     public CreateEventResponse createEvent(CreateEventRequest request) {
-        // TODO Auto-generated method stub
-        try {
-            validateUUID(request.customer_id());
-            validateTimestamp(request.timestamp());
-            Event event = new Event(request.customer_id(), request.event_type(), request.timestamp(), request.metadata());
-            Event savedEvent = eventDao.save(event);
-            log.atInfo().log("Event created with ID: {}", savedEvent.getId());
-            return new CreateEventResponse(
-                savedEvent.getId()
-            );
-        }catch (Exception e) {
-            log.atError().log(e.getMessage());
-            throw new UnsupportedOperationException("Unimplemented method 'createEvent'");
-        }
+        validateUUID(request.customer_id());
+        validateTimestamp(request.timestamp());
+        Event event = new Event(request.customer_id(), request.event_type(), request.timestamp(), request.metadata());
+        Event savedEvent = eventDao.save(event);
+        log.atInfo().log("Event created with ID: {}", savedEvent.getId());
+        return new CreateEventResponse(savedEvent.getId());
     }
 
     @Override
     public GetEventResponse getEvent(String event_id) {
-        // TODO Auto-generated method stub
-        try {
-            validateUUID(event_id);
-            // return new GetEventResponse(
-            //     "event_123", "customer_456", "Event Name", LocalDate.now(), null
-            // );
-            Optional<Event> event = eventDao.findEventById(event_id);
-            log.atInfo().log("Event retrieved with ID: {} , result: {}", event_id, event.orElse(null));
-            if (event.isPresent()) {
-                return new GetEventResponse(
-                    event.get().getId(),
-                    event.get().getCustomerId(),
-                    event.get().getType(),
-                    event.get().getTimestamp(),
-                    event.get().getMetadata()
-                );
-            } else {
-                log.atWarn().log("Event not found with ID: {}", event_id);
-                throw new NotFoundException("Event not found with ID: " + event_id);
-            }
-        }catch (Exception e) {
-            log.atError().log(e.getMessage());
-            throw new UnsupportedOperationException("Unimplemented method 'getEvent'");
+        validateUUID(event_id);
+        Optional<Event> event = eventDao.findEventById(event_id);
+        log.atInfo().log("Event retrieved with ID: {} , result: {}", event_id, event.orElse(null));
+        if (event.isPresent()) {
+            return new GetEventResponse(
+                event.get().getId(),
+                event.get().getCustomerId(),
+                event.get().getType(),
+                event.get().getTimestamp(),
+                event.get().getMetadata()
+            );
+        } else {
+            log.atWarn().log("Event not found with ID: {}", event_id);
+            throw new NotFoundException("Event not found with ID: " + event_id);
         }
     }
 
     @Override
     public GetSummaryResponse getSummary(String customer_id, LocalDate startTime, LocalDate endTime) {
-        // TODO Auto-generated method stub
-        try {
-            validateUUID(customer_id);
-            validateTimestamp(startTime);
-            validateTimestamp(endTime);
-            if (startTime.isAfter(endTime)) {
-                throw new ValidationException("Start time cannot be after end time");
-            }
-            // return new GetSummaryResponse(
-            //     "customer_456", 0, null
-            // );
-            List<Event> events = eventDao.findEventsByTimestampBetween(startTime, endTime);
-            log.atInfo().log("Summary retrieved for customer: {}, start time: {}, end time: {}, event count: {}", customer_id, startTime, endTime, events.size());
-
-            return new GetSummaryResponse(
-                customer_id,
-                events.size(),
-                countEvents(events)
-            );
-        }catch (Exception e) {
-            log.atError().log(e.getMessage());
-            throw new UnsupportedOperationException("Unimplemented method 'getSummary'");
+        validateUUID(customer_id);
+        validateTimestamp(startTime);
+        validateTimestamp(endTime);
+        if (startTime.isAfter(endTime)) {
+            throw new ValidationException("Start time cannot be after end time");
         }
+        List<Event> events = eventDao.findEventsByTimestampBetween(startTime, endTime);
+        log.atInfo().log("Summary retrieved for customer: {}, start time: {}, end time: {}, event count: {}", customer_id, startTime, endTime, events.size());
+        return new GetSummaryResponse(customer_id, events.size(), countEvents(events));
     }
 
     @Override
     public ListTopEventsResponse getTopEvents(int limit) {
-        // TODO Auto-generated method stub
-        try {
-            // return new ListTopEventsResponse(
-            //     new ArrayList<Integer>()
-            // );
-            if (limit <= 0) {
-                log.atError().log("Limit must be a positive integer {} ", limit);
-                throw new ValidationException("Limit must be a positive integer");
-            }
-            if (limit > 100) {
-                log.atError().log("Limit cannot exceed 100 {} ", limit);
-                throw new ValidationException("Limit cannot exceed 100");
-            }
-            List<Event> events = eventDao.findTopEventsSortedByTimestampDesc(PageRequest.of(0, limit));
-            log.atInfo().log("Top events retrieved with limit: {}, event count: {}", limit, events.size());
-            return wrapperResponse(events);
-        }catch (Exception e) {
-            log.atError().log(e.getMessage());
-            throw new UnsupportedOperationException("Unimplemented method 'getTopEvents'");
+        if (limit <= 0) {
+            log.atError().log("Limit must be a positive integer {} ", limit);
+            throw new ValidationException("Limit must be a positive integer");
         }
+        if (limit > 100) {
+            log.atError().log("Limit cannot exceed 100 {} ", limit);
+            throw new ValidationException("Limit cannot exceed 100");
+        }
+        List<Event> events = eventDao.findTopEventsSortedByTimestampDesc(PageRequest.of(0, limit));
+        log.atInfo().log("Top events retrieved with limit: {}, event count: {}", limit, events.size());
+        return wrapperResponse(events);
     }
     
     private void validateTimestamp(LocalDate timestamp) {

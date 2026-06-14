@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.NotFoundException;
 import com.example.demo.ValidationException;
 import com.example.demo.dao.EventDao;
 import com.example.demo.dto.*;
@@ -78,7 +79,7 @@ class EventServiceImpTest {
         when(eventDao.findEventById(VALID_UUID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getEvent(VALID_UUID))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -122,14 +123,14 @@ class EventServiceImpTest {
 
     @Test
     void getTopEvents_returnsItems() {
-        when(eventDao.findTopEventsByTimestamp(2)).thenReturn(List.of(
+        when(eventDao.findTopEventsSortedByTimestampDesc(any())).thenReturn(List.of(
                 event("CLICK", LocalDate.of(2026, 1, 10)),
                 event("VIEW",  LocalDate.of(2026, 1, 11))));
 
         ListTopEventsResponse response = service.getTopEvents(2);
 
         assertThat(response).isNotNull();
-        verify(eventDao).findTopEventsByTimestamp(2);
+        verify(eventDao).findTopEventsSortedByTimestampDesc(any());
     }
 
     @Test
